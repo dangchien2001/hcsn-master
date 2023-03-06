@@ -21,7 +21,10 @@
                             {'popup-content-icon-fail' : type == 'fail'}
                         ]"
                     ></div>
-                    <div class="popup-content-text">{{ content }}</div>
+                    <div class="popup-content-text">
+                        {{ content }}
+                        <slot></slot>
+                    </div>
                 </div>
 
                 <!-- thanh button -->
@@ -71,13 +74,32 @@
                         @click="exitPopup"
                     ></MButton>
 
+                    <!-- deleteOption -->
+                    
+
+                    <MButton
+                        text="Không"
+                        type="button-container"
+                        class="sub-button"
+                        v-if="deleteOption"
+                        @click="exitPopup"
+                    ></MButton>
+
+                    <MButton
+                        text="Xóa"
+                        type="button-container"
+                        class="main-button"
+                        v-if="deleteOption"
+                        @click="() => {this.$emit('deleteAction')}"
+                    ></MButton>
+
                 </div>
 
                 <!-- nút x  -->
-                <div 
+                <!-- <div 
                     class="popup-exit"
                     @click="exitPopup"
-                ></div>
+                ></div> -->
 
             </div>
 
@@ -123,13 +145,17 @@ export default {
         if(this.typeButton == "closeOption") {
             this.closeOption = true;
         }
+        if(this.typeButton == "deleteOption") {
+            this.deleteOption = true;
+        }
         
     },
     data() {
         return {
             fullOption: false,
             acceptOption: false,
-            closeOption: false
+            closeOption: false,
+            deleteOption: false,
         }
     }
 }

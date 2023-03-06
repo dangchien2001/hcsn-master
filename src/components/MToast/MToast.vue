@@ -7,22 +7,22 @@
         <div :class="'toast-container-icon ' + toastIcon"></div>
 
         <!-- title status -->
-        <div 
+        <!-- <div 
             :class="'toast-container-title ' +  
             colorTitle"
-        >{{ title }}</div>&nbsp;
+        >{{ title }}</div>&nbsp; -->
 
         <!-- content status -->
         <div class="toast-container-content">{{ content }}</div>
 
         <!-- hoàn tác -->
-        <div class="toast-container-return">Hoàn tác</div>
+        <!-- <div class="toast-container-return">Hoàn tác</div> -->
 
         <!-- hủy -->
-        <div 
+        <!-- <div 
             class="toast-container-cancel"
             @click="hideToast"
-        ></div>
+        ></div> -->
 
     </div>
 
@@ -60,7 +60,7 @@ export default {
         }
 
         // component ẩn sau 5s
-        setTimeout(() => this.isShow = false, 5000);
+        setTimeout(() => {this.isShow = false, this.$emit('hideToast')}, 5000);
 
     },
     methods: {

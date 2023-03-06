@@ -301,6 +301,8 @@
                 typeButton="closeOption"
             ></MPopup>
 
+
+
         </div>
 
     </div>
@@ -316,6 +318,7 @@ import MPopup from '@/components/MPopup/MPopup.vue';
 import axios from 'axios';
 import MTooltip from '@/components/MTooltip/MTooltip.vue';
 import comon from "@/js/comon";
+
 
 export default {
     props: {
@@ -492,7 +495,9 @@ export default {
                         "ModifiedDate": ""
                     
                 })
-                .then(res => console.log(res));               
+                .then(res => {
+                    (this.numberOfAffectedRows = res.data)
+                });               
             } catch(e) {
                 console.log(e);
             }
@@ -576,6 +581,16 @@ export default {
             console.log("firstError: ", newValue);
         },
 
+        /**
+         * Đóng form và emit thành công ra ngoài sau khi sửa thành công
+         * @param {*} newValue 
+         */
+        numberOfAffectedRows: function(newValue) {
+            if(newValue == 1) {
+                this.$emit('showEditSuccessToast');               
+                this.$emit('closeForm');
+            }
+        }
         
     },
     created() {
@@ -673,6 +688,8 @@ export default {
             firstError: "",
             // biến ẩn hiện popup validate
             isShowPopupValidate: false,
+            // biến lưu số bản ghi ảnh hưởng
+            numberOfAffectedRows: 0,
         }
     }
 }

@@ -149,6 +149,7 @@
 /*Đây là những trường hợp đổi màu của icon-button với từng sự kiện*/
 .icon-btn-container:hover {
     background-color: #F6F6F6;
+    z-index: 2;
 }
 
 .icon-btn-container:active {

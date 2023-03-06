@@ -1,5 +1,7 @@
 <template>
-    <div class="combobox-with-icon-container">
+    <div 
+        class="combobox-with-icon-container"
+    >
 
         <!-- icon -->
         <div class="combobox-with-icon-icon">
@@ -12,6 +14,8 @@
             class="combobox-with-icon-input" 
             :placeholder="placeholder"
             v-model="text"
+            @blur="hideDropDown"
+            ref="input"
         >
 
         <!-- drop down icon -->
@@ -64,9 +68,11 @@ export default {
         handleComboboxList(status) {
             if(status == "open") {
                 this.isOpen = true;
+                this.$refs.input.focus();
             }
             if(status == "close") {
                 this.isOpen = false;
+                this.$refs.input.focus();
             }
         },
 
@@ -80,6 +86,13 @@ export default {
             this.text = data[this.entity];
             this.isOpen = false;
         },
+
+        /***
+         * Hàm dùng để ẩn drop down sau khi nhấn vào chỗ khác
+         */
+        hideDropDown() {
+            this.isOpen = false;
+        }
         
     },
     created() {

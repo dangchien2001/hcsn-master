@@ -66,10 +66,10 @@
             <!-- nút xóa -->
             <div 
                 class="inline-block delete-button" 
-                @click="() => (this.isShowPopup = true)"
             >               
                 <MIconButton
                     tooltipText="Xóa tài sản"
+                    @click="() => (this.isShowPopup = true)"
                 >
                     <div class="delete-icon-button"></div>
                 </MIconButton>
@@ -86,6 +86,9 @@
                 @NumberOfRecords="NumberOfRecords"
                 :filter="assetSearch"
                 entity="AssetId"
+                @showEditSuccessToast="showEditSuccessToast('Lưu dữ liệu thành công')"
+                @listAssetForDelete="emitDeleteAsset"
+                :tableChange="this.tableChange"
             ></MTable>
         </div>
         
@@ -101,19 +104,22 @@
         <!-- toast message -->
         <MToast
             status="success"
-            content="Dữ liệu đã bị xóa thành công"
+            :content="this.toastMessage"
             @hideToast="hideToast"
             v-if="isShowToats"
         ></MToast>
 
-        <!-- popup -->
+        <!-- popup xóa tài sản -->
         <MPopup
-            title="Dữ liệu đã thay đổi"
-            content="Lưu lại những thay đổi"
+            content=""
             @exitPopup="exitPopup"
             v-if="isShowPopup"
             type="warning"
-        ></MPopup>
+            typeButton="deleteOption"
+            @deleteAction="deleteAsset"
+        >
+            <span style="font-family: Roboto Bold;">{{ this.listAssetForDelete.length < 10 ? "0" + this.listAssetForDelete.length : this.listAssetForDelete.length }}</span> tài sản đã được chọn. Bạn có muốn xóa các tài sản này khỏi danh sách ?
+        </MPopup>
         
     </div>
 </template>
@@ -128,6 +134,7 @@ import MProductDetail from '@/pages/productDetail/MProductDetail.vue';
 import MToast from '@/components/MToast/MToast.vue';
 import MPopup from '@/components/MPopup/MPopup.vue';
 import resource from '@/js/resource';
+import axios from 'axios';
 
 export default {
     name: "TheContent",
@@ -135,6 +142,37 @@ export default {
         MInputWithIcon, MComboboxWithIcon, MButton, MIconButton,MTable ,MProductDetail, MToast, MPopup
     },
     methods: {
+
+        /**
+         * Hàm dùng để lấy dữ liệu được emit từ table phục vụ xóa bản ghi
+         */
+        emitDeleteAsset(listAssetForDelete) {
+            this.listAssetForDelete = listAssetForDelete;
+        },
+
+        /**
+         * Hàm dùng để xóa tài sản
+         */
+        deleteAsset() {
+            if(this.listAssetForDelete.length > 0) {
+                try {
+                    axios.delete("https://localhost:7210/api/Assets/assetIds", {
+                        data: Object.values(this.listAssetForDelete)
+                    })
+                    .then(res => {
+                        (console.log(res.data)),
+                        // thay đổi biến tableChange để tác động vào table
+                        (this.tableChange = !this.tableChange),
+                        // ẩn popup
+                        (this.isShowPopup = false),
+                        // hiện toast
+                        (this.showEditSuccessToast('Xóa tài sản thành công'))
+                    })
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        },
 
         /**
          * Hàm đóng mở form
@@ -180,9 +218,15 @@ export default {
          */
         assetFilter(value, entity) {
             this.assetSearch = value[entity];
+        },
+
+        /**
+         * Hàm hiển thị toast khi lưu dữ liệu thành công
+         */
+        showEditSuccessToast(toastMessage) {
+            this.isShowToats = true;
+            this.toastMessage = toastMessage;
         }
-
-
         
     },
 
@@ -191,7 +235,7 @@ export default {
             isHide: false,
 
             // biến lưu trạng thái ẩn hiện của toast
-            isShowToats: true,
+            isShowToats: false,
 
             // biến lưu trạng thái ẩn hiện của popup
             isShowPopup: false,
@@ -208,6 +252,12 @@ export default {
 
             // biến hứng dữ liệu search
             assetSearch: "",
+            // mảng hứng id tài sản phục vụ chức năng xóa
+            listAssetForDelete: [],        
+            // biến lưu message của toast
+            toastMessage: "",
+            // biến dùng để tác động vào table thông qua watch của table dùng để reset dữ liệu sau khi xóa
+            tableChange: true,
         }
     }
 }

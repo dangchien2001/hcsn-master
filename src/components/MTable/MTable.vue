@@ -233,6 +233,7 @@
         :dataForEdit="data"
         v-if="isShowForm"
         @closeForm="closeForm"
+        @showEditSuccessToast=showEditSuccessToast
     ></MProductDetail>
 
     <!-- form nhân bản tài sản -->
@@ -263,6 +264,7 @@ export default {
         model: String,
         filter: String,
         entity: String,
+        tableChange: Boolean,
     },
     created() {
 
@@ -284,6 +286,16 @@ export default {
         }
     },
     methods: {
+
+        /**
+         * Hàm dùng để hủy tích v trên tất cả các dòng
+         * Created by: NDCHIEN(6/3/2023)
+         */
+        unSelectRow() {
+            for(let i=0; i < this.rows.length; i++) {
+                this.rows[i] = false;
+            }
+        },
 
         /**
          * Hàm format tiền việt
@@ -376,16 +388,23 @@ export default {
          * Created by: NDCHIEN(2/3/2023)
          */
         handleSelectAll(value) {
-            if(value == true) {
+            if(value == true) {                
+                this.listForDeleteAll = [];
                 for(let i = 0; i < this.datas.length; i++) {
-                    this.rows[i] = true;
+                    this.rows[i] = true;    
+                    const dataSelected = this.datas[i][this.entity];                  
+                    this.listForDeleteAll.push(dataSelected);
+                    this.listAssetForDelete = this.listForDeleteAll;
                 }
+                this.$emit('listAssetForDelete', Object.values(this.listAssetForDelete));
                 return;
             }
             if(value == false) {
                 for(let i = 0; i < this.datas.length; i++) {
                     this.rows[i] = false;
                 }
+                this.listAssetForDelete.splice(0, this.datas.length);
+                this.$emit('listAssetForDelete', Object.values(this.listAssetForDelete));
                 return;
             }
         },
@@ -398,10 +417,37 @@ export default {
          */
         handleSelectRow(value, row) {
             if(row == true) {
-                console.log("value: ", value, " row: ", true);
+                this.listAssetForDelete.push(value);
+                this.$emit('listAssetForDelete', Object.values(this.listAssetForDelete));
             }
             if(row == false) {
-                console.log("value: ", value, " row: ", false);
+                this.isCheckboxHeaderSelect = false;
+                const indexOfRow = this.listAssetForDelete.indexOf(value);
+                this.listAssetForDelete.splice(indexOfRow, 1);
+                this.$emit('listAssetForDelete', Object.values(this.listAssetForDelete));
+            }
+        },
+
+        /**
+         * Hàm dùng để hiện toast sau khi chỉnh sửa thành công 
+         */
+        showEditSuccessToast() {
+            this.$emit('showEditSuccessToast');
+            // gọi api được truyền vào từ props
+            try {
+                axios
+                    .get(this.api + '?PageNumber=' + 1 + '&PageSize=' + this.PageSize)
+                    .then(res => {
+                        (this.datas = res.data.Data), 
+                        (this.$emit("emitData", this.datas)), 
+                        (this.TotalData = res.data.Data.length), 
+                        (this.TotalQuantity = this.Total("quantity")),
+                        (this.TotalPrice = this.Total("Price")),
+                        (this.TotalAccumulatedDepreciation = this.Total("AccumulatedDepreciation")),
+                        (this.TotalResidualValue = this.Total("ResidualValue"))
+                    })
+            } catch (e) {
+                console.log(e);
             }
         }
     },
@@ -411,7 +457,12 @@ export default {
          * Gọi API mỗi khi thay đổi page size
          * Created by: NDCHIEN(2/3/2023)
          */
-        PageSize: function(newValue) {            
+        PageSize: function(newValue) {     
+            // Ẩn tick v của tất cả các dòng
+            for(let i=0; i < this.rows.length; i++) {
+                this.rows[i] = false;
+            }
+            // goi api
             try {
                 this.PageIndex = 1;
                 this.ActivePage = 1;
@@ -436,6 +487,11 @@ export default {
          * Created by: NDCHIEN(2/3/2023)
          */
         PageIndex: function(newValue) {
+            // Ẩn tick v của tất cả các dòng
+            for(let i=0; i < this.rows.length; i++) {
+                this.rows[i] = false;
+            }
+            // goi api
             try {
                 axios
                     .get(this.api + '?assetFilter=' + this.filter + '&PageNumber=' + newValue + '&PageSize=' + this.PageSize)
@@ -473,6 +529,34 @@ export default {
             } catch (e) {
                 console.log(e);
             }
+        },
+
+        /**
+         * Hàm được gọi đến sau khi xóa thành công
+         * @param {*} newValue 
+         * Created by: NDCHIEN(6/3/2023)
+         */
+        tableChange: function() {
+            // làm rỗng mảng emit ra ngoài
+            this.listAssetForDelete = [];
+            // goi api làm mới dữ liệu
+            try {
+                axios
+                    .get(this.api + '?assetFilter=' + this.filter + '&PageNumber=' + this.PageIndex + '&PageSize=' + this.PageSize)
+                    .then(res => {
+                        (this.datas = res.data.Data), 
+                        (this.$emit("emitData", this.datas)), 
+                        (this.TotalData = res.data.Data.length), 
+                        (this.TotalQuantity = this.Total("quantity")),
+                        (this.TotalPrice = this.Total("Price")),
+                        (this.TotalAccumulatedDepreciation = this.Total("AccumulatedDepreciation")),
+                        (this.TotalResidualValue = this.Total("ResidualValue")),
+                        (this.unSelectRow()),
+                        (this.isCheckboxHeaderSelect = false)
+                    })
+            } catch (e) {
+                console.log(e);
+            }
         }
     },
     data() {
@@ -500,7 +584,7 @@ export default {
             isShowNumberOfRecord: false,
 
             // biến lưu số bản ghi trên 1 trang
-            PageSize: 10,
+            PageSize: 20,
 
             // biến lưu số trang
             PageIndex: 1,
@@ -520,7 +604,7 @@ export default {
             // biến dùng hứng trạng thái của checkbox header
             isCheckboxHeaderSelect: false,
 
-            // đối tượng dùng để lưu trạng thái của từng row tương ứng với tối đa 100 row
+            // mảng dùng để lưu trạng thái của từng row tương ứng với tối đa 100 row
             rows: [
                 // 10 biến
                 false,
@@ -632,7 +716,12 @@ export default {
                 false,
                 false,
                 false,
-            ]
+            ],
+            // mảng dùng để lưu danh sách mã tài sản phục vụ chức năng xóa nhiều
+            listAssetForDelete: [],
+
+            // Mảng dùng để lưu tất cả phần tử trong mảng hoặc ko có phần tử nào 
+            listForDeleteAll: [],
         }
     }
 }

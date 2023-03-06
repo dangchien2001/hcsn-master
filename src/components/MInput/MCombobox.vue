@@ -22,6 +22,8 @@
             :placeholder="placeholder"
             :value="modelValue"
             @input="filterItem"
+            @blur="hideDropDown"
+            ref="input"
         >
 
         <!-- nút mở combobox -->
@@ -121,10 +123,12 @@ export default {
          */
         toogleComboboxList(action) {
             if(action == "open") {
-                this.isOpen = true;               
+                this.isOpen = true;      
+                this.$refs.input.focus();         
             }
             if(action == "close") {
                 this.isOpen = false;
+                this.$refs.input.focus();
             }
         },
 
@@ -190,6 +194,13 @@ export default {
         enter() {
             this.selectData(this.filterResult[this.index][this.entity]);
         },
+
+        /**
+         * Hàm dùng để ẩn dropdown khi nhấn vào chỗ khác
+         */
+        hideDropDown() {
+            this.isOpen = false;
+        }
 
     },
     created() {
