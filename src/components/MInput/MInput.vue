@@ -15,6 +15,7 @@
             @click="selectAllText"
             @input="emitValue"
             :value="modelValue"
+            :style="'text-align:' + textAlign"
         >
         <div 
             class="warning"
@@ -35,6 +36,7 @@ export default {
         important: Boolean,
         modelValue: String,
         isEmpty: Boolean,
+        textAlign: String,
     },
     methods: {
 

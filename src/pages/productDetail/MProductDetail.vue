@@ -214,13 +214,12 @@
                             class="price-count-product
                             price-count-product-right">
 
-                            <MNumberInput
-                                label="Năm theo dõi"
-                                :allowArrow="false"
-                                :disabled="true"
-                                :alowNull="true"
-                                v-model="ProductInfo.YearOfTracking"
-                            ></MNumberInput>
+                            <MInput
+                                :alowDisabled="true"
+                                fieldLabel="Năm theo dõi"
+                                v-model="this.ProductInfo.YearOfTracking"
+                                textAlign="right"
+                            ></MInput>
 
                         </div>
 
