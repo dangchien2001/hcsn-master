@@ -462,6 +462,11 @@ export default {
             for(let i=0; i < this.rows.length; i++) {
                 this.rows[i] = false;
             }
+            // Ẩn tick v trên checkbox header
+            this.isCheckboxHeaderSelect = false;
+            // làm rỗng mảng emit ra ngoài
+            this.listAssetForDelete = [];
+            this.$emit('listAssetForDelete', Object.values(this.listAssetForDelete));
             // goi api
             try {
                 this.PageIndex = 1;
@@ -491,6 +496,11 @@ export default {
             for(let i=0; i < this.rows.length; i++) {
                 this.rows[i] = false;
             }
+            // Ẩn tick v trên checkbox header
+            this.isCheckboxHeaderSelect = false;
+            // làm rỗng mảng emit ra ngoài
+            this.listAssetForDelete = [];
+            this.$emit('listAssetForDelete', Object.values(this.listAssetForDelete));
             // goi api
             try {
                 axios

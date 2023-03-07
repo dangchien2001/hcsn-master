@@ -35,6 +35,7 @@
         <div
             class="combobox-with-icon-list"
             v-if="isOpen"
+            @mousedown="(event)=>{event.preventDefault()}"
         >
             <div 
                 class="combobox-with-icon-item"

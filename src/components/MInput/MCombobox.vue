@@ -44,6 +44,7 @@
         <div 
             class="combobox-list"
             v-if="isOpen"
+            @mousedown="(event)=>{event.preventDefault()}"
         >
             <div 
                 :class="['item-combobox', {'item-combobox-active' : index == this.index}]"
