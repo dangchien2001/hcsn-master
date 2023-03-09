@@ -193,7 +193,7 @@ export default {
         },
 
         enter() {
-            this.selectData(this.filterResult[this.index][this.entity]);
+            this.selectData(this.filterResult[this.index][this.entity], this.filterResult[this.index][this.entityEmit]);
         },
 
         /**

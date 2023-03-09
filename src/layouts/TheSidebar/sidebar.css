@@ -33,11 +33,29 @@
     align-items: center;
     cursor: pointer;
     margin-bottom: 10px;
+    position: relative;
 }
 
 .sidebar-item:hover {
     background-color: #1aa4c8;
     opacity: 1;
+    z-index: 2;
+}
+
+.sidebar-tooltip {
+    display: none;
+    background-color: #FFFFFF;
+    width: 200%;
+}
+
+.short-sidebar:hover .sidebar-tooltip {
+    display: block;
+    z-index: 1;
+}
+
+.sidebar-tooltip {
+    position: absolute;
+    left: 120%;
 }
 
 /*Lớp active dùng cho trang được active*/

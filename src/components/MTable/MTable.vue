@@ -234,6 +234,7 @@
         v-if="isShowForm"
         @closeForm="closeForm"
         @showEditSuccessToast=showEditSuccessToast
+        typeForm="edit"
     ></MProductDetail>
 
     <!-- form nhân bản tài sản -->

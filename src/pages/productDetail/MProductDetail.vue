@@ -34,6 +34,7 @@
                         :alowDisabled="false"  
                         :isEmpty="isProductCodeEmpty"
                         @result="CheckEmployeeCodeEmpty"
+                        :code="true"
                     ></MInput>
 
                     <!-- combobox chứa mã bộ phận sử dụng -->
@@ -265,6 +266,7 @@
                     class="save-button"
                     type="button-container"
                     @click="handleSaveProduct()"
+                    @keyup.enter="handleSaveProduct()"
                 ></MButton>
 
             </div>
@@ -325,11 +327,14 @@ export default {
         data: Array,
         dataForEdit: String,
         dataForClone: String,
+        typeForm: String,
     },
     components: {
         MInput, MCombobox, MDatetime, MButton, MNumberInput, MPopup, MTooltip
     },
     methods: {
+
+        
 
         /**
          * Hàm dùng để gọi API lấy ra tên bộ phân sử dụng và tên loại sản phẩm
@@ -463,7 +468,14 @@ export default {
             }   
 
             // gọi API nếu hàm không return lỗi
-            this.editAsset();
+            if(this.typeForm == 'edit') {
+                this.editAsset();
+            }
+
+            // gọi API nếu hàm không return lỗi
+            if(this.typeForm == 'add') {
+                this.addAsset();
+            }
         },
 
         /**
@@ -496,6 +508,38 @@ export default {
                 })
                 .then(res => {
                     (this.numberOfAffectedRows = res.data)
+                });               
+            } catch(e) {
+                console.log(e);
+            }
+        },
+
+        /**
+         * Hàm dùng để thêm mới tài sản
+         * Created by: NDCHIEN(9/3/2023)
+         */
+        addAsset() {
+            try {
+                axios.post("https://localhost:7210/api/Assets/", 
+                    {
+                    "AssetCode": this.ProductInfo.ProductCode,
+                    "AssetName": this.ProductInfo.ProductName,
+                    "AssetCategoryId": this.ProductInfo.AssetCategoryId,
+                    "DepartmentId": this.ProductInfo.DepartmentId,
+                    "Quantity": this.ProductInfo.Quantity,
+                    "Price": this.ProductInfo.Price,
+                    "AccumulatedDepreciation": this.ProductInfo.WearRate * this.ProductInfo.Price,
+                    "ResidualValue": this.ProductInfo.ResidualValue,
+                    "CreatedBy": "",
+                    "CreatedDate": "2023-02-28T03:21:36.291Z",
+                    "ModifiedBy": "",
+                    "ModifiedDate": "2023-02-28T03:21:36.291Z"
+                    }
+                )
+                .then(res => {
+                    if(res.data >= 1) {
+                        this.$emit("addSuccess");
+                    }
                 });               
             } catch(e) {
                 console.log(e);
@@ -592,6 +636,9 @@ export default {
         }
         
     },
+    mounted() {
+        
+    },
     created() {
         /**
          * Đặt giá trị năm hiện tại cho trường Năm theo dõi
@@ -623,6 +670,20 @@ export default {
                             (this.ProductInfo.DepartmentId = res.data[0].DepartmentId),
                             (this.ProductInfo.ProductId = res.data[0].AssetId)
                         })
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        /**
+         * Gọi API lấy mã lớn nhất để thêm, nhân bản tài sản
+         */
+        if(this.dataForEdit == null) {
+            try {
+                axios
+                    .get('https://localhost:7210/api/Assets/MaxAssetCode')
+                    .then(res => {
+                        (this.ProductInfo.ProductCode = res.data)
+                    })
             } catch (e) {
                 console.log(e);
             }

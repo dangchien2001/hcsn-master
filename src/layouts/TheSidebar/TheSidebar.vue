@@ -34,7 +34,14 @@
             >
                 {{ sidebarItemIcon.text }}
             </div>
+
+            <MTooltip
+            :text="sidebarItemIcon.text"
+            class="sidebar-tooltip"
+            ></MTooltip>
         </div>
+
+        
 
         <!-- open close sidebar -->
         <div class="toggle-sidebar">
@@ -54,14 +61,19 @@
 </template> 
 
 <script>
+import MTooltip from '@/components/MTooltip/MTooltip.vue';
 import resource from "../../js/resource.js"
+
 export default {
     name: "TheSidebar",
+    components: {
+        MTooltip
+    },
     methods: {
         closeSidebar() {
             this.sidebarStatus.hide = false;
             this.sidebarStatus.sidebarWidth = "";
-            this.sidebarStatus.sidebarItemWidth = "";
+            this.sidebarStatus.sidebarItemWidth = "short-sidebar";
         },
         openSidebar() {
             this.sidebarStatus.hide = true;

@@ -15,7 +15,8 @@
             @click="selectAllText"
             @input="emitValue"
             :value="modelValue"
-            :style="'text-align:' + textAlign"
+            :style="'text-align:' + textAlign"     
+            ref='focusMe'      
         >
         <div 
             class="warning"
@@ -37,6 +38,12 @@ export default {
         modelValue: String,
         isEmpty: Boolean,
         textAlign: String,
+        code: Boolean,
+    },
+    mounted() {
+        if(this.code) {
+            this.$refs.focusMe.focus();
+        }
     },
     methods: {
 

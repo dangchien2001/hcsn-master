@@ -92,13 +92,15 @@
             ></MTable>
         </div>
         
-        <!-- form thêm sửa tài sản -->
+        <!-- form thêm tài sản -->
         <MProductDetail
             v-if="isHide"
             @closeForm = handleForm
             title="Thêm mới tài sản"
             :data="this.dataFromTable"
             :dataForEdit="null"
+            typeForm="add"
+            @addSuccess="handleAfterAddSuccess"
         ></MProductDetail>
 
         <!-- toast message -->
@@ -142,6 +144,17 @@ export default {
         MInputWithIcon, MComboboxWithIcon, MButton, MIconButton,MTable ,MProductDetail, MToast, MPopup
     },
     methods: {
+
+        /**
+         * Hàm dùng để xử lý sau khi thêm mới tài sản thành công
+         * Created by: NDCHIEN(9/3/2023)
+         */
+        handleAfterAddSuccess() {
+            this.isHide = false;
+            this.isShowToats = true;
+            this.toastMessage = 'Lưu dữ liệu thành công';
+            this.tableChange = !this.tableChange;
+        },
 
         /**
          * Hàm dùng để lấy dữ liệu được emit từ table phục vụ xóa bản ghi
